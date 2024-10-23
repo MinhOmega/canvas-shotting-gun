@@ -106,7 +106,8 @@ const CanvasGame = () => {
     if (!canvas) return;
 
     const updateCanvasSize = () => {
-      const size = Math.min(window.innerWidth, window.innerHeight);
+      const maxSize = Math.min(800, window.innerWidth * 0.8, window.innerHeight * 0.8);
+      const size = Math.max(300, maxSize); // Ensure a minimum size of 300px
       canvas.width = size;
       canvas.height = size;
       drawGun();
@@ -180,39 +181,45 @@ const CanvasGame = () => {
   const memoizedFPSCounter = useMemo(() => <MemoizedFPSCounter fps={fps} />, [fps]);
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center">
-      {memoizedFPSCounter}
-      {isGameOver && (
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-          <p className="text-red-500 text-4xl mb-4">Game Over!</p>
-          <button
-            onClick={resetGame}
-            className="mt-4 px-6 py-3 text-xl bg-red-500 text-white border-none cursor-pointer rounded-md hover:bg-red-600 transition-colors"
-          >
-            Play Again
-          </button>
+    <div className="w-full min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="relative w-full max-w-3xl aspect-square">
+        {memoizedFPSCounter}
+        {isGameOver && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
+            <div className="text-center bg-white p-6 rounded-lg">
+              <p className="text-red-500 text-4xl mb-4">Game Over!</p>
+              <button
+                onClick={resetGame}
+                className="px-6 py-3 text-xl bg-red-500 text-white border-none cursor-pointer rounded-md hover:bg-red-600 transition-colors"
+              >
+                Play Again
+              </button>
+            </div>
+          </div>
+        )}
+
+        <canvas ref={canvasRef} className="w-full h-full" />
+
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-xs">
+          {!gameStarted && !isGameOver && (
+            <button
+              onClick={startGame}
+              className="w-full px-6 py-3 text-xl bg-green-500 text-white border-none cursor-pointer rounded-md hover:bg-green-600 transition-colors"
+            >
+              Start Game
+            </button>
+          )}
+
+          {gameStarted && !isGameOver && (
+            <button
+              onClick={fireGun}
+              className="w-full px-6 py-3 text-xl bg-orange-500 text-white border-none cursor-pointer rounded-md hover:bg-orange-600 transition-colors"
+            >
+              Fire
+            </button>
+          )}
         </div>
-      )}
-
-      <canvas ref={canvasRef} className="block mx-auto" />
-
-      {!gameStarted && !isGameOver && (
-        <button
-          onClick={startGame}
-          className="mt-6 px-6 py-3 text-xl bg-green-500 text-white border-none cursor-pointer rounded-md hover:bg-green-600 transition-colors"
-        >
-          Start Game
-        </button>
-      )}
-
-      {gameStarted && !isGameOver && (
-        <button
-          onClick={fireGun}
-          className="mt-6 px-6 py-3 text-xl bg-orange-500 text-white border-none cursor-pointer rounded-md hover:bg-orange-600 transition-colors"
-        >
-          Fire
-        </button>
-      )}
+      </div>
     </div>
   );
 };
